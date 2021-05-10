@@ -1,21 +1,23 @@
 {
-  "name": "devcamper-api",
-  "version": "0.1.0",
-  "description": "Devcamper project API",
-  "main": "server.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "Rob Ranf",
-  "license": "ISC",
-  "devDependencies": {
-    "eslint": "^7.25.0"
-  },
-  "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "cors": "^2.8.5",
-    "dotenv": "^9.0.0",
-    "express": "^4.17.1",
-    "mongoose": "^5.12.7"
-  }
+	"name": "devcamper-api",
+	"version": "0.1.0",
+	"description": "Devcamper project API",
+	"main": "server.js",
+	"scripts": {
+		"start": "NODE_ENV=production node serve",
+		"dev": "nodemon server.js",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "Rob Ranf",
+	"license": "ISC",
+	"devDependencies": {
+		"eslint": "^7.25.0"
+	},
+	"dependencies": {
+		"bcryptjs": "^2.4.3",
+		"cors": "^2.8.5",
+		"dotenv": "^9.0.0",
+		"express": "^4.17.1",
+		"mongoose": "^5.12.7"
+	}
 }
