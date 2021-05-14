@@ -11,6 +11,7 @@
 	"author": "Rob Ranf",
 	"license": "ISC",
 	"devDependencies": {
+		"colors": "^1.4.0",
 		"eslint": "^7.25.0"
 	},
 	"dependencies": {
@@ -20,5 +21,13 @@
 		"express": "^4.17.1",
 		"mongoose": "^5.12.7",
 		"morgan": "^1.10.0"
-	}
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/rlr524/devcamper-api.git"
+	},
+	"bugs": {
+		"url": "https://github.com/rlr524/devcamper-api/issues"
+	},
+	"homepage": "."
 }
