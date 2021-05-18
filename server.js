@@ -35,6 +35,7 @@ if (process.env.NODE_ENV === "development") {
 // Mount routers
 app.use("/api/v1/bootcamps", bootcamps);
 
+// Instantiate server
 const server = app.listen(process.env.PORT || 3000, () => {
 	let port = process.env.PORT || 3000;
 	console.log(
@@ -47,8 +48,7 @@ process.on("unhandledRejection", (err) => {
 	console.log(`Error: ${err.message}`.red.underline.bold);
 	logger.log({
 		level: "error",
-		label: "server.js",
-		message: `error - unhandled rejection: ${err.message}`,
+		message: `error in server.js - unhandled rejection: ${err.message}`,
 	});
 	// Close server and exit process
 	server.close(() => {

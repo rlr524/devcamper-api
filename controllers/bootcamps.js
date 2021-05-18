@@ -9,6 +9,7 @@ exports.getBootcamps = async (req, res) => {
 		const bootcamps = await Bootcamp.find({});
 		res.status(200).json({
 			success: true,
+			count: bootcamps.length,
 			data: bootcamps,
 		});
 	} catch (err) {
@@ -17,8 +18,7 @@ exports.getBootcamps = async (req, res) => {
 		});
 		logger.log({
 			level: "error",
-			label: "bootcamp.js - getBootcamps",
-			message: `${err.message}`,
+			message: `error in /controllers/bootcamps.js getBootcamps(): ${err.message}`,
 		});
 	}
 };
@@ -30,11 +30,12 @@ exports.getBootcamp = async (req, res) => {
 	try {
 		const bootcamp = await Bootcamp.findById(req.params.id);
 		if (!bootcamp) {
-			return res.status(400).json({
+			return res.status(404).json({
 				success: false,
+				msg: `No resource with the id of ${req.params.id}`,
 			});
 		}
-		res.status(200).json({
+		return res.status(200).json({
 			success: true,
 			data: bootcamp,
 		});
@@ -44,8 +45,7 @@ exports.getBootcamp = async (req, res) => {
 		});
 		logger.log({
 			level: "error",
-			label: "bootcamp.js - getBootcamp()",
-			message: `${err.message}`,
+			message: `error in /controllers/bootcamps.js getBootcamp(): ${err.message}`,
 		});
 	}
 	res.status(200).json({
@@ -71,8 +71,7 @@ exports.createBootcamp = async (req, res) => {
 		});
 		logger.log({
 			level: "error",
-			label: "bootcamps.js - createBootcamp",
-			message: `${err.message}`,
+			message: `error in /controllers/bootcamps.js createBootcamp(): ${err.message}`,
 		});
 	}
 };
@@ -80,19 +79,66 @@ exports.createBootcamp = async (req, res) => {
 // @desc    Update a bootcamp
 // @route   PUT /api/v1/bootcamps/:id
 // @access  Private
-exports.updateBootcamp = (req, res) => {
-	res.status(200).json({
-		success: true,
-		msg: `Update bootcamp with the id of ${req.params.id}`,
-	});
+exports.updateBootcamp = async (req, res) => {
+	try {
+		const bootcamp = await Bootcamp.findByIdAndUpdate(
+			req.params.id,
+			req.body,
+			{ new: true, runValidators: true }
+		);
+		if (!bootcamp) {
+			return res.status(404).json({
+				success: false,
+				message: `No resource with the id of ${req.params.id}`,
+			});
+		}
+		return res.status(200).json({
+			success: true,
+			data: bootcamp,
+		});
+	} catch (err) {
+		res.status(400).json({
+			success: false,
+		});
+		logger.log({
+			level: "error",
+			message: `error in /controllers/bootcamps.js updateBootcamp(): ${err.message}`,
+		});
+	}
 };
 
-// @desc    Delete a bootcamp
-// @route   DELETE /api/v1/bootcamps/:id
+// @desc    Delete a bootcamp by updating the deleted flag to true
+// @route   PATCH /api/v1/bootcamps/:id
 // @access  Private
-exports.deleteBootcamp = (req, res) => {
-	res.status(200).json({
-		success: true,
-		msg: `Delete the bootcamp with the id of ${req.params.id}`,
-	});
+exports.deleteBootcamp = async (req, res) => {
+	try {
+		const bootcamp = await Bootcamp.findByIdAndUpdate(
+			req.params.id,
+			{
+				deleted: true,
+			},
+			{
+				new: true,
+				runValidators: true,
+			}
+		);
+		if (!bootcamp) {
+			return res.status(404).json({
+				success: false,
+				message: `No resource with the id of ${req.params.id}`,
+			});
+		}
+		return res.status(200).json({
+			success: true,
+			data: bootcamp,
+		});
+	} catch (err) {
+		res.status(400).json({
+			success: false,
+		});
+		logger.log({
+			level: "error",
+			message: `error in /controllers/bootcamp.js deleteBootcamp(): ${err.message}`,
+		});
+	}
 };

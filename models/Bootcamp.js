@@ -102,10 +102,27 @@ const BootcampSchema = new mongoose.Schema({
 		type: Boolean,
 		default: false,
 	},
-	created: {
+	deleted: {
+		type: Boolean,
+		default: false,
+	},
+	createdAt: {
 		type: Date,
 		default: Date.now,
 	},
+	updatedAt: {
+		type: Date,
+		default: Date.now,
+	},
+});
+
+BootcampSchema.pre("save", function (next) {
+	var now = new Date();
+	this.updatedAt = now;
+	if (this.createdAt) {
+		this.createdAt = now;
+	}
+	next();
 });
 
 module.exports = mongoose.model("Bootcamp", BootcampSchema);
