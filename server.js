@@ -4,6 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const cors = require("cors");
 const logger = require("./middleware/errorLogger");
+const errorHandler = require("./middleware/error");
 const morgan = require("morgan");
 const connectDB = require("./config/db");
 require("colors");
@@ -34,6 +35,9 @@ if (process.env.NODE_ENV === "development") {
 
 // Mount routers
 app.use("/api/v1/bootcamps", bootcamps);
+
+// Custom error handler middleware
+app.use(errorHandler);
 
 // Instantiate server
 const server = app.listen(process.env.PORT || 3000, () => {
