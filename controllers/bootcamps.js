@@ -1,3 +1,4 @@
+const ErrorResponse = require("../utils/errorResponse");
 const Bootcamp = require("../models/Bootcamp");
 
 // @desc    Get all bootcamps
@@ -12,7 +13,11 @@ exports.getBootcamps = async (req, res, next) => {
 			data: bootcamps,
 		});
 	} catch (err) {
-		next(err);
+		next(
+			new ErrorResponse(
+				"Error in /controllers/bootcamps.js getBootcamps(): Error retrieving bootcamps"
+			)
+		);
 	}
 };
 
@@ -33,7 +38,12 @@ exports.getBootcamp = async (req, res, next) => {
 			data: bootcamp,
 		});
 	} catch (err) {
-		next(err);
+		next(
+			new ErrorResponse(
+				`Error in /controllers/bootcamps.js getBootcamp(): ${req.params.id} is not a valid bootcamp id`,
+				400
+			)
+		);
 	}
 };
 

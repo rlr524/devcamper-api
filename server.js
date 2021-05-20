@@ -47,7 +47,7 @@ const server = app.listen(process.env.PORT || 3000, () => {
 	);
 });
 
-// Handle unhandled promise rejections by crashing the app
+// Handle unhandled promise rejections such as failure to connect to the db by crashing the app
 process.on("unhandledRejection", (err) => {
 	console.log(`Error: ${err.message}`.red.underline.bold);
 	logger.log({
