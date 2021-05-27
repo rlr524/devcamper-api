@@ -1,4 +1,14 @@
+/**
+ *@fileoverview This is the Mongoose model for our Bootcamp collection
+ *@description The BootcampSchema defines all fields related to the bootcamps collection in the devcamper database on Mongo Atlas
+ *@copyright Emiya Consulting 2021
+ *@author Rob Ranf
+ *@version 0.1
+ *@since 5/26/2021
+ */
+
 const mongoose = require("mongoose");
+const slugify = require("slugify");
 
 const BootcampSchema = new mongoose.Schema(
 	{
@@ -112,5 +122,12 @@ const BootcampSchema = new mongoose.Schema(
 		timestamps: true,
 	}
 );
+
+/** @method */
+// Create a bootcamp slug using the provided name
+BootcampSchema.pre("save", function (next) {
+	this.slug = slugify(this.name, { lower: true });
+	next();
+});
 
 module.exports = mongoose.model("Bootcamp", BootcampSchema);

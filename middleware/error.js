@@ -1,7 +1,16 @@
+/**
+ *@fileoverview This is a custom error handler piece of middleware
+ *@description The errorHandler function allows use of node-winston and console logging for error output
+ *@copyright Emiya Consulting 2021
+ *@author Rob Ranf
+ *@version 0.1
+ *@since 5/26/2021
+ */
+
 const logger = require("../middleware/errorLogger");
 const ErrorResponse = require("../utils/errorResponse");
 
-/* eslint-disable-next-line */
+/** @constructor */
 const errorHandler = (err, req, res, next) => {
 	let error = {
 		...err,
@@ -18,7 +27,7 @@ const errorHandler = (err, req, res, next) => {
 
 	// Mongoose duplicate key
 	if (err.code === 11000) {
-		const message = `${err.name} : ${err.message} : "${err.keyValue.name}" already exists in the database`;
+		const message = `${err.name} : ${err.message} : "${err.keyValue.name}" already exists in the database.`;
 		error = new ErrorResponse(message, 400);
 	}
 
@@ -29,10 +38,12 @@ const errorHandler = (err, req, res, next) => {
 		error = new ErrorResponse(message, 400);
 	}
 
-	res.status(error.statusCode || 500).json({
-		success: false,
-		error: error.message || "Server Error",
-	});
+	next(
+		res.status(error.statusCode || 500).json({
+			success: false,
+			error: error.message || "Server Error",
+		})
+	);
 
 	logger.log({
 		level: "error",

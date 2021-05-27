@@ -1,3 +1,12 @@
+/**
+ *@fileoverview This is the main entry point of the Devcamper web service
+ *@description Implements required middleware for http res/req (express.js and cors), db connectivity, and routing as well as morgan for route access logging; also spins up a server.
+ *@copyright Emiya Consulting 2021
+ *@author Rob Ranf
+ *@version 0.1
+ *@since 5/26/2021
+ */
+
 require("dotenv").config({ path: "./config/.env" });
 const express = require("express");
 const fs = require("fs");

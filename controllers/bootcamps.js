@@ -1,6 +1,6 @@
 /**
  *@fileoverview This is a set of functions that act as controllers for all routs
- *@description Using asyncHandler middleware to handle async/await try/catch blocks
+ *@description Route controller functions using asyncHandler middleware to handle async/await try/catch blocks
  *@copyright Emiya Consulting 2021
  *@author Rob Ranf
  *@version 0.1
@@ -14,15 +14,13 @@ const ErrorResponse = require("../utils/errorResponse");
 // @desc    Get all bootcamps
 // @route   GET /api/v1/bootcamps
 // @access  Public
-exports.getBootcamps = asyncHandler(async (req, res, next) => {
+exports.getBootcamps = asyncHandler(async (req, res) => {
 	const bootcamps = await Bootcamp.find({});
-	return next(
-		res.status(200).json({
-			success: true,
-			count: bootcamps.length,
-			data: bootcamps,
-		})
-	);
+	return res.status(200).json({
+		success: true,
+		count: bootcamps.length,
+		data: bootcamps,
+	});
 });
 
 // @desc    Get a single bootcamp
@@ -47,15 +45,12 @@ exports.getBootcamp = asyncHandler(async (req, res, next) => {
 // @desc    Create a new bootcamp
 // @route   POST /api/v1/bootcamps
 // @access  Private
-exports.createBootcamp = asyncHandler(async (req, res, next) => {
+exports.createBootcamp = asyncHandler(async (req, res) => {
 	const bootcamp = await Bootcamp.create(req.body);
-	next(
-		res.status(201).json({
-			success: true,
-			data: bootcamp,
-		})
-	);
-	console.log(bootcamp);
+	return res.status(201).json({
+		success: true,
+		data: bootcamp,
+	});
 });
 
 // @desc    Update a bootcamp
@@ -87,6 +82,7 @@ exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
 	const bootcamp = await Bootcamp.findByIdAndUpdate(
 		req.params.id,
 		{
+			name: `${req.params.id}__DELETED`,
 			deleted: true,
 		},
 		{
