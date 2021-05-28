@@ -1,3 +1,7 @@
+/**
+ * @fileoverview This file contains formatting and the function for the custom error logger using the Winston package
+ */
+
 const { createLogger, format, transports } = require("winston");
 const { combine, timestamp, printf } = format;
 const path = require("path");
