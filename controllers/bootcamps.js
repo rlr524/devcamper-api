@@ -7,6 +7,7 @@
  *@since 5/26/2021
  */
 
+const geocoder = require("../utils/geocoder");
 const Bootcamp = require("../models/Bootcamp");
 const asyncHandler = require("../middleware/async");
 const ErrorResponse = require("../utils/errorResponse");
@@ -39,6 +40,44 @@ exports.getBootcamp = asyncHandler(async (req, res, next) => {
 	return res.status(200).json({
 		success: true,
 		data: bootcamp,
+	});
+});
+
+// @desc	Get bootcamps within a radius of a given location
+// @route	GET /api/v1/bootcamps/radius/:zipcode/:distance
+// @access	Public
+exports.getBootcampsInRadius = asyncHandler(async (req, res, next) => {
+	const { zipcode, distance } = req.params;
+
+	// Get latitude and longitude from geocoder
+	const loc = await geocoder.geocode(zipcode);
+	const lat = loc[0].latitude;
+	const lon = loc[0].longitude;
+
+	// Calculate radius using radians; divide distance by radius of the Earth
+	// Earth radius = 6,378km, 3,963mi
+	/**
+	 * @todo //TODO UI should allow for selection of metric or imperial / US customary units
+	 */
+	const radius = distance / 3963;
+
+	const bootcamps = await Bootcamp.find({
+		location: { $geoWithin: { $centerSphere: [[lon, lat], radius] } },
+	});
+
+	if (bootcamps.length === 0) {
+		return next(
+			new ErrorResponse(
+				`No bootcamps were found within the provided combination of ${req.params.zipcode} zipcode and ${req.params.distance} miles radius. Try expanding your search.`,
+				404
+			)
+		);
+	}
+
+	res.status(200).json({
+		success: true,
+		count: bootcamps.length,
+		data: bootcamps,
 	});
 });
 
