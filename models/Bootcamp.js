@@ -84,7 +84,7 @@ const BootcampSchema = new mongoose.Schema(
 				"Web Development",
 				"Mobile Development",
 				"UI/UX",
-				"Database Devlopment",
+				"Database Development",
 				"Information Security",
 				"Systems and Networking",
 				"Data Science",

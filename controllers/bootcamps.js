@@ -17,12 +17,35 @@ const ErrorResponse = require("../utils/errorResponse");
 // @access  Public
 exports.getBootcamps = asyncHandler(async (req, res) => {
 	let query;
-	let queryStr = JSON.stringify(req.query);
+	// Copy req.query
+	const reqQuery = { ...req.query };
+	// Fields to exclude from match
+	const removeFields = ["select", "sort"];
+	// Loop over removeFields and delete them from reqQuery
+	removeFields.forEach((param) => delete reqQuery[param]);
+	// Create query string
+	let queryStr = JSON.stringify(reqQuery);
+	// Create MongoDB operators (gt, lte, etc)
 	queryStr = queryStr.replace(
 		/\b(gt|gte|lt|lte|in)\b/g,
 		(match) => `$${match}`
 	);
+	// Finding resource using model and turning it back into an object
 	query = Bootcamp.find(JSON.parse(queryStr));
+	// Select fields
+	if (req.query.select) {
+		const fields = req.query.select.split(",").join(" ");
+		query = query.select(fields);
+	}
+	// Sort results
+	if (req.query.sort) {
+		const sortBy = req.query.sort.split(",").join(" ");
+		query = query.sort(sortBy);
+	} else {
+		// Default sort to createdAt field in descending order
+		query = query.sort("-createdAt");
+	}
+	// Executing query
 	const bootcamps = await query;
 	return res.status(200).json({
 		success: true,
