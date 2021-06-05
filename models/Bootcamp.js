@@ -69,6 +69,7 @@ const BootcampSchema = new mongoose.Schema(
 			 * @todo //TODO When adding location fields to front end, include localization options to allow fields to be labelled province, prefecture, postal code, etc.
 			 */
 			formattedAddress: String,
+			number: String,
 			street: String,
 			city: String,
 			state: String,
@@ -145,9 +146,10 @@ BootcampSchema.pre("save", async function (next) {
 		type: "Point",
 		coordinates: [loc[0].longitude, loc[0].latitude],
 		formattedAddress: loc[0].formattedAddress,
+		number: loc[0].streetNumber,
 		street: loc[0].streetName,
 		city: loc[0].city,
-		state: loc[0].stateCode,
+		state: loc[0].administrativeLevels.level1short,
 		zipcode: loc[0].zipcode,
 		country: loc[0].countryCode,
 	};
