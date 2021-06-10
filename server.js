@@ -29,6 +29,7 @@ connectDB();
 
 // Route imports
 const bootcamps = require("./routes/bootcamps");
+const courses = require("./routes/courses");
 
 // Log stream for http requests with Morgan dev logging middleware
 var accessLogStream = fs.createWriteStream(
@@ -44,6 +45,7 @@ if (process.env.NODE_ENV === "development") {
 
 // Mount routers
 app.use("/api/v1/bootcamps", bootcamps);
+app.use("/api/v1/courses", courses);
 
 // Custom error handler middleware
 app.use(errorHandler);
