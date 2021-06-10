@@ -7,8 +7,8 @@
 		"start": "NODE_ENV=production node serve",
 		"dev": "nodemon server.js",
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"seed:bootcamp": "node seeder.js -i",
-		"delete:bootcamp": "node seeder.js -d"
+		"seedDB": "node seeder.js -i",
+		"deleteDB": "node seeder.js -d"
 	},
 	"author": "Rob Ranf",
 	"license": "ISC",
