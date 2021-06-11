@@ -13,70 +13,77 @@ const ErrorResponse = require("../utils/errorResponse");
 
 // @desc    Get all courses
 // @route   GET /api/v1/courses
+// @route	GET /api/v1/bootcamps/:bootcampId/courses
 // @access  Public
 exports.getCourses = asyncHandler(async (req, res) => {
 	let query;
-	// Copy req.query
-	const reqQuery = { ...req.query };
-	// Fields to exclude from query param match
-	const removeFields = ["select", "sort", "limit", "page"];
-	// Loop over removeFields and delete them from reqQuery
-	removeFields.forEach((param) => delete reqQuery[param]);
-	// Create query string
-	let queryStr = JSON.stringify(reqQuery);
-	// Create MongoDB operators (gt, lte, etc)
-	queryStr = queryStr.replace(
-		/\b(gt|gte|lt|lte|in)\b/g,
-		(match) => `$${match}`
-	);
-	// Finding resource using model and turning it back into an object
-	query = Course.find(JSON.parse(queryStr));
-	// Select fields
-	if (req.query.select) {
-		const fields = req.query.select.split(",").join(" ");
-		query = query.select(fields);
-	}
-	// Sort results
-	if (req.query.sort) {
-		const sortBy = req.query.sort.split(",").join(" ");
-		query = query.sort(sortBy);
+
+	if (req.params.bootcampId) {
+		query = Course.find({ bootcamp: req.params.bootcampId });
 	} else {
-		// Default sort to createdAt field in descending order
-		query = query.sort("-createdAt");
+		query = Course.find();
 	}
+	// // Copy req.query
+	// const reqQuery = { ...req.query };
+	// // Fields to exclude from query param match
+	// const removeFields = ["select", "sort", "limit", "page"];
+	// // Loop over removeFields and delete them from reqQuery
+	// removeFields.forEach((param) => delete reqQuery[param]);
+	// // Create query string
+	// let queryStr = JSON.stringify(reqQuery);
+	// // Create MongoDB operators (gt, lte, etc)
+	// queryStr = queryStr.replace(
+	// 	/\b(gt|gte|lt|lte|in)\b/g,
+	// 	(match) => `$${match}`
+	// );
+	// // Finding resource using model and turning it back into an object
+	// query = Course.find(JSON.parse(queryStr));
+	// // Select fields
+	// if (req.query.select) {
+	// 	const fields = req.query.select.split(",").join(" ");
+	// 	query = query.select(fields);
+	// }
+	// // Sort results
+	// if (req.query.sort) {
+	// 	const sortBy = req.query.sort.split(",").join(" ");
+	// 	query = query.sort(sortBy);
+	// } else {
+	// 	// Default sort to createdAt field in descending order
+	// 	query = query.sort("-createdAt");
+	// }
 
-	// Pagination
-	const pageVal = parseInt(req.query.page, 10) || 1;
-	const limitVal = parseInt(req.query.limit, 10) || 25;
-	const startIndex = (pageVal - 1) * limitVal;
-	const endIndex = pageVal * limitVal;
-	const totalDocuments = await Course.countDocuments(JSON.parse(queryStr));
+	// // Pagination
+	// const pageVal = parseInt(req.query.page, 10) || 1;
+	// const limitVal = parseInt(req.query.limit, 10) || 25;
+	// const startIndex = (pageVal - 1) * limitVal;
+	// const endIndex = pageVal * limitVal;
+	// const totalDocuments = await Course.countDocuments(JSON.parse(queryStr));
 
-	query = query.skip(startIndex).limit(limitVal);
+	// query = query.skip(startIndex).limit(limitVal);
 
 	// Executing query
 	const courses = await query;
 
-	// Pagination result
-	const pagination = {};
-	if (endIndex < totalDocuments) {
-		pagination.next = {
-			page: pageVal + 1,
-			limitVal,
-		};
-	}
-	if (startIndex > 0) {
-		pagination.prev = {
-			page: pageVal - 1,
-			limitVal,
-		};
-	}
+	// // Pagination result
+	// const pagination = {};
+	// if (endIndex < totalDocuments) {
+	// 	pagination.next = {
+	// 		page: pageVal + 1,
+	// 		limitVal,
+	// 	};
+	// }
+	// if (startIndex > 0) {
+	// 	pagination.prev = {
+	// 		page: pageVal - 1,
+	// 		limitVal,
+	// 	};
+	// }
 
 	// Returning results
 	return res.status(200).json({
 		success: true,
 		count: courses.length,
-		pagination,
+		// pagination,
 		data: courses,
 	});
 });

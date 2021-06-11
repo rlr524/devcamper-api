@@ -8,7 +8,8 @@ const {
 	deleteCourse,
 } = require("../controllers/courses");
 
-const router = express.Router();
+// Need to set mergeParams to true here to allow the use of params from both the courses and bootcamps routes
+const router = express.Router({ mergeParams: true });
 
 router.route("/").get(getCourses).post(createCourse);
 router.route("/:id").get(getCourse).put(updateCourse).patch(deleteCourse);
