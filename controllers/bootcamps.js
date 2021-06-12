@@ -210,7 +210,7 @@ exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
 	}
 
 	// Trigger middleware in Bootcamp model to cascade flag as deleted all courses
-	bootcamp.remove();
+	bootcamp.update();
 
 	return res.status(200).json({
 		success: true,
