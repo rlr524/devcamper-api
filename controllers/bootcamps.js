@@ -31,7 +31,8 @@ exports.getBootcamps = asyncHandler(async (req, res) => {
 		(match) => `$${match}`
 	);
 	// Finding resource using model and turning it back into an object
-	query = Bootcamp.find(JSON.parse(queryStr));
+	// As well as populating courses (all fields given no options) into the bootcamp object (see virtuals in Bootcamp model)
+	query = Bootcamp.find(JSON.parse(queryStr)).populate("courses");
 	// Select fields
 	if (req.query.select) {
 		const fields = req.query.select.split(",").join(" ");
@@ -86,7 +87,7 @@ exports.getBootcamps = asyncHandler(async (req, res) => {
 // @route   GET /api/v1/bootcamps/:id
 // @access  Public
 exports.getBootcamp = asyncHandler(async (req, res, next) => {
-	const bootcamp = await Bootcamp.findById(req.params.id);
+	const bootcamp = await Bootcamp.findById(req.params.id).populate("courses");
 	if (!bootcamp) {
 		return next(
 			new ErrorResponse(
@@ -177,6 +178,7 @@ exports.updateBootcamp = asyncHandler(async (req, res, next) => {
 			)
 		);
 	}
+
 	return res.status(200).json({
 		success: true,
 		data: bootcamp,
@@ -206,6 +208,10 @@ exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
 			)
 		);
 	}
+
+	// Trigger middleware in Bootcamp model to cascade flag as deleted all courses
+	bootcamp.remove();
+
 	return res.status(200).json({
 		success: true,
 		data: bootcamp,

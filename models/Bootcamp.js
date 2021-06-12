@@ -125,6 +125,10 @@ const BootcampSchema = new mongoose.Schema(
 		},
 	},
 	{
+		toJSON: { virtuals: true },
+		toObject: { virtuals: true },
+	},
+	{
 		timestamps: true,
 	}
 );
@@ -156,6 +160,35 @@ BootcampSchema.pre("save", async function (next) {
 	// Do not save address as inputted in DB
 	this.address = undefined;
 	next();
+});
+
+// Cascade flag courses as deleted when a bootcamp is flagged as deleted
+BootcampSchema.pre("remove", async function (next) {
+	console.log(`Courses being flagged as deleted from bootcamp ${this._id}`);
+	await this.model("Course").updateMany(
+		{ bootcamp: this._id },
+		{
+			deleted: true,
+			title: `CASCADE DELETED WHEN BOOTCAMP WITH ID OF ${this._id} WAS DELETED`,
+		}
+	);
+	next();
+});
+
+// Defining a virtual here because we want to display all courses that are part of a bootcamp
+// however we don't have an actual "courses" document in our Bootcamp schema and don't want one
+// (we only link a bootcamp to a course in the Courses model). Think of a virtual as a virtual
+// sort of a join or, in Mongo terms, an virtual embed in which we can join two schemas (collections)
+// without actually persisting any new data to either. Note this will return a local field named "id"
+// that maps to _id.
+// We need to state that our model uses virtuals using the toJSON and toObject properties.
+// Note we could use embedded documents directly in Mongo if we needed to persist the courses within
+// our Bootcamps in a 1 to many relationship.
+BootcampSchema.virtual("courses", {
+	ref: "Course",
+	localField: "_id",
+	foreignField: "bootcamp",
+	justOne: false,
 });
 
 module.exports = mongoose.model("Bootcamp", BootcampSchema);

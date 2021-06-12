@@ -21,7 +21,11 @@ exports.getCourses = asyncHandler(async (req, res) => {
 	if (req.params.bootcampId) {
 		query = Course.find({ bootcamp: req.params.bootcampId });
 	} else {
-		query = Course.find();
+		// Use the Mongoose populate() method to
+		query = Course.find().populate({
+			path: "bootcamp",
+			select: "name description",
+		});
 	}
 	// // Copy req.query
 	// const reqQuery = { ...req.query };
