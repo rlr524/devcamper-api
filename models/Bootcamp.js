@@ -162,19 +162,6 @@ BootcampSchema.pre("save", async function (next) {
 	next();
 });
 
-// Cascade flag courses as deleted when a bootcamp is flagged as deleted
-BootcampSchema.pre("remove", async function (next) {
-	console.log(`Courses being flagged as deleted from bootcamp ${this._id}`);
-	await this.model("Course").updateMany(
-		{ bootcamp: this._id },
-		{
-			deleted: true,
-			title: `CASCADE DELETED WHEN BOOTCAMP WITH ID OF ${this._id} WAS DELETED`,
-		}
-	);
-	next();
-});
-
 // Defining a virtual here because we want to display all courses that are part of a bootcamp
 // however we don't have an actual "courses" document in our Bootcamp schema and don't want one
 // (we only link a bootcamp to a course in the Courses model). Think of a virtual as a virtual

@@ -11,6 +11,7 @@ const geocoder = require("../utils/geocoder");
 const Bootcamp = require("../models/Bootcamp");
 const asyncHandler = require("../middleware/async");
 const ErrorResponse = require("../utils/errorResponse");
+// const cascadeDelete = require("../middleware/cascadeDelete");
 
 // @desc    Get all bootcamps
 // @route   GET /api/v1/bootcamps
@@ -189,10 +190,11 @@ exports.updateBootcamp = asyncHandler(async (req, res, next) => {
 // @route   PATCH /api/v1/bootcamps/:id
 // @access  Private
 exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
+	let id = req.params.id;
 	const bootcamp = await Bootcamp.findByIdAndUpdate(
-		req.params.id,
+		id,
 		{
-			name: `${req.params.id}__DELETED`,
+			name: `${id}__DELETED`,
 			deleted: true,
 		},
 		{
@@ -200,17 +202,18 @@ exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
 			runValidators: true,
 		}
 	);
+
 	if (!bootcamp) {
 		return next(
-			new ErrorResponse(
-				`No resource found with the id of ${req.params.id}`,
-				404
-			)
+			new ErrorResponse(`No resource found with the id of ${id}`, 404)
 		);
 	}
 
-	// Trigger middleware in Bootcamp model to cascade flag as deleted all courses
-	bootcamp.update();
+	/**
+	 * @todo // TODO Trigger cascadeDelete middleware to cascade flag as deleted all courses - middleware is not working
+	 */
+
+	// cascadeDelete();
 
 	return res.status(200).json({
 		success: true,
