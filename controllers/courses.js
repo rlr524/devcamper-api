@@ -8,10 +8,11 @@
  */
 
 const Course = require("../models/Course");
+const Bootcamp = require("../models/Bootcamp");
 const asyncHandler = require("../middleware/async");
 const ErrorResponse = require("../utils/errorResponse");
 
-// @desc    Get all courses
+// @desc    Get all courses or all courses by a single bootcamp
 // @route   GET /api/v1/courses
 // @route	GET /api/v1/bootcamps/:bootcampId/courses
 // @access  Public
@@ -96,11 +97,14 @@ exports.getCourses = asyncHandler(async (req, res) => {
 // @route   GET /api/v1/courses/:id
 // @access  Public
 exports.getCourse = asyncHandler(async (req, res, next) => {
-	const course = await Course.findById(req.params.id);
+	const course = await Course.findById(req.params.id).populate({
+		path: "bootcamp",
+		select: "name description",
+	});
 	if (!course) {
 		return next(
 			new ErrorResponse(
-				`No resource found with the id of ${req.params.id}`,
+				`No course found with the id of ${req.params.id}`,
 				404
 			)
 		);
@@ -114,11 +118,25 @@ exports.getCourse = asyncHandler(async (req, res, next) => {
 /**
  * @todo //TODO Determine how to do a lookup within the specified bootcamp for which the course is being added and check if the course name is already used
  */
-// @desc    Create a new course
-// @route   POST /api/v1/courses
+// @desc    Create a new course attached to a specific bootcamp
+// @route   POST /api/v1/bootcamps/:bootcampId/courses
 // @access  Private
-exports.createCourse = asyncHandler(async (req, res) => {
+exports.createCourse = asyncHandler(async (req, res, next) => {
+	req.body.bootcamp = req.params.bootcampId;
+
+	const bootcamp = Bootcamp.findById(req.params.bootcampId);
+
+	if (!bootcamp) {
+		return next(
+			new ErrorResponse(
+				`No bootcamp found with the id of ${req.params.bootcampId}`,
+				404
+			)
+		);
+	}
+
 	const course = await Course.create(req.body);
+
 	return res.status(201).json({
 		success: true,
 		data: course,
@@ -129,18 +147,22 @@ exports.createCourse = asyncHandler(async (req, res) => {
 // @route   PUT /api/v1/courses/:id
 // @access  Private
 exports.updateCourse = asyncHandler(async (req, res, next) => {
-	const course = await Course.findByIdAndUpdate(req.params.id, req.body, {
-		new: true,
-		runValidators: true,
-	});
+	let course = await Course.findById(req.params.id);
+
 	if (!course) {
 		return next(
 			new ErrorResponse(
-				`No resource found with the id of ${req.params.id}`,
+				`No course found with the id of ${req.params.id}`,
 				404
 			)
 		);
 	}
+
+	course = await Course.findByIdAndUpdate(req.params.id, req.body, {
+		new: true,
+		runValidators: true,
+	});
+
 	return res.status(200).json({
 		success: true,
 		data: course,
@@ -151,25 +173,29 @@ exports.updateCourse = asyncHandler(async (req, res, next) => {
 // @route   PATCH /api/v1/courses/:id
 // @access  Private
 exports.deleteCourse = asyncHandler(async (req, res, next) => {
-	const course = await Course.findByIdAndUpdate(
+	let course = await Course.findById(req.params.id);
+
+	if (!course) {
+		return next(
+			new ErrorResponse(
+				`No course found with the id of ${req.params.id}`,
+				404
+			)
+		);
+	}
+
+	course = await Course.findByIdAndUpdate(
 		req.params.id,
 		{
-			title: `${req.params.id}__DELETED`,
 			deleted: true,
+			title: `${req.params.id}__DELETED`,
 		},
 		{
 			new: true,
 			runValidators: true,
 		}
 	);
-	if (!course) {
-		return next(
-			new ErrorResponse(
-				`No resource found with the id of ${req.params.id}`,
-				404
-			)
-		);
-	}
+
 	return res.status(200).json({
 		success: true,
 		data: course,
