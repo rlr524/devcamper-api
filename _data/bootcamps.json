@@ -63,5 +63,28 @@
 		"jobAssistance": true,
 		"jobGuarantee": true,
 		"acceptGi": true
+	},
+	{
+		"_id": "5d725a1b7b292f5f8ceff789",
+		"user": "5c8a1d5b0190b214360dc032",
+		"name": "Sound Tech Bootcamp",
+		"description": "Learn front-end and back-end web development and mobile app development in the Pacific Northwest",
+		"website": "https://soundtechschool.com",
+		"phone": "(425) 599-1111",
+		"email": "enroll@soundtechschool.com",
+		"address": "17400 NE Union Hill Rd Redmond, WA 98052",
+		"careers": [
+			"Web Development",
+			"Mobile Development",
+			"UI/UX",
+			"Database Development",
+			"Information Security",
+			"Systems and Networking",
+			"Data Science"
+		],
+		"housing": true,
+		"jobAssistance": true,
+		"jobGuarantee": false,
+		"acceptGi": true
 	}
 ]

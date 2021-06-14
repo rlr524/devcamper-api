@@ -97,5 +97,27 @@
 		"scholarhipsAvailable": false,
 		"bootcamp": "5d725a1b7b292f5f8ceff788",
 		"user": "5c8a1d5b0190b214360dc032"
+	},
+	{
+		"_id": "5d725a4a7b292f5f8ceff790",
+		"title": "Managing junior devs",
+		"description": "For management track senior devs, this course will teach you management skills for working with young / beginner devs",
+		"weeks": 6,
+		"tuition": 4000,
+		"minimumSkill": "advanced",
+		"scholarhipsAvailable": false,
+		"bootcamp": "5d725a1b7b292f5f8ceff789",
+		"user": "5c8a1d5b0190b214360dc032"
+	},
+	{
+		"_id": "5d725a4a7b292f5f8ceff791",
+		"title": "Android Devlopment",
+		"description": "Get started building mobile applications for Android using Kotlin, Android Studio and other tools",
+		"weeks": 12,
+		"tuition": 9000,
+		"minimumSkill": "intermediate",
+		"scholarhipsAvailable": false,
+		"bootcamp": "5d725a1b7b292f5f8ceff789",
+		"user": "5c8a1d5b0190b214360dc032"
 	}
 ]
