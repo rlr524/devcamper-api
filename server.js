@@ -16,6 +16,8 @@ const logger = require("./middleware/errorLogger");
 const errorHandler = require("./middleware/error");
 const morgan = require("morgan");
 const connectDB = require("./config/db");
+const { s3, upload } = require("./middleware/imageUpload");
+const uuid = require("uuid");
 require("colors");
 
 const app = express();
@@ -30,6 +32,28 @@ connectDB();
 // Route imports
 const bootcamps = require("./routes/bootcamps");
 const courses = require("./routes/courses");
+
+// Base route for uploading images
+app.post("/api/v1/upload", upload, (req, res) => {
+	let image = req.file.originalname.split(".");
+	const imageType = image[image.length - 1];
+
+	const params = {
+		Bucket: process.env.AWS_BUCKET_NAME,
+		Key: `${uuid()}.${imageType}`,
+		Body: req.file.buffer,
+	};
+
+	s3.upload(params, (err, data) => {
+		if (err) {
+			res.status(500).send(err);
+		}
+		res.status(200).json({
+			success: true,
+			url: data.Location,
+		});
+	});
+});
 
 // Log stream for http requests with Morgan dev logging middleware
 var accessLogStream = fs.createWriteStream(
