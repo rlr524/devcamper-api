@@ -16,7 +16,10 @@ const logger = require("./middleware/errorLogger");
 const errorHandler = require("./middleware/error");
 const morgan = require("morgan");
 const connectDB = require("./config/db");
-const fileupload = require("express-fileupload");
+const { s3, upload } = require("./middleware/imageUpload");
+const uuid = require("uuid");
+const Bootcamp = require("./models/Bootcamp");
+const ErrorResponse = require("./utils/errorResponse");
 require("colors");
 
 const app = express();
@@ -32,6 +35,66 @@ connectDB();
 const bootcamps = require("./routes/bootcamps");
 const courses = require("./routes/courses");
 
+// @desc	Upload a photo for a bootcamp
+// @route	POST /api/v1/bootcamps/:id/upload
+// @access	Private
+app.post("/api/v1/bootcamps/:id/upload", upload, async (req, res, next) => {
+	let id = req.params.id;
+	const bootcamp = await Bootcamp.findById(id);
+	let image = req.file.originalname.split(".");
+	let imageSize = req.file.size;
+	let fileType = req.file.mimetype;
+	let imageSizeMB = Math.ceil(process.env.FILE_SIZE_LIMIT / 1048576);
+	const imageType = image[image.length - 1];
+
+	if (!bootcamp) {
+		return next(
+			new ErrorResponse(`No bootcamp found with the id of ${id}`, 404)
+		);
+	}
+
+	if (!req.file) {
+		return next(new ErrorResponse(`Please upload an image file`, 400));
+	}
+
+	if (!fileType.startsWith("image")) {
+		return next(new ErrorResponse(`File must be an image`), 400);
+	}
+
+	if (imageSize > process.env.FILE_SIZE_LIMIT) {
+		return next(
+			new ErrorResponse(
+				`Please limit the image size to less than ${imageSizeMB}MB`,
+				400
+			)
+		);
+	}
+
+	const params = {
+		Bucket: process.env.AWS_BUCKET_NAME,
+		Key: `${uuid()}.${imageType}`,
+		Body: req.file.buffer,
+	};
+
+	s3.upload(params, async (err, data) => {
+		if (err) {
+			res.status(500).send(err);
+		}
+
+		await Bootcamp.findByIdAndUpdate(id, {
+			photo: data.Location,
+		});
+
+		res.status(200).json({
+			success: true,
+			url: data.Location,
+			type: imageType,
+			mimeType: fileType,
+			data,
+		});
+	});
+});
+
 // Log stream for http requests with Morgan dev logging middleware
 var accessLogStream = fs.createWriteStream(
 	path.join(__dirname + "/logs", "access.log"),
@@ -43,9 +106,6 @@ var accessLogStream = fs.createWriteStream(
 if (process.env.NODE_ENV === "development") {
 	app.use(morgan("combined", { stream: accessLogStream }));
 }
-
-// File upload middleware
-app.use(fileupload());
 
 // Set static folder
 app.use(express.static(path.join(__dirname, "public")));
