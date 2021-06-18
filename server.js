@@ -1,5 +1,5 @@
 /**
- *@fileoverview This is the main entry point of the Devcamper web service
+ *@fileoverview Main entry point of the Devcamper web service
  *@description Implements required middleware for http res/req (express.js and cors), db connectivity, and routing as well as morgan for route access logging; also spins up a server.
  *@copyright Emiya Consulting 2021
  *@author Rob Ranf
@@ -36,6 +36,7 @@ const bootcamps = require("./routes/bootcamps");
 const courses = require("./routes/courses");
 
 /**
+ * @description Uses the imageUpload middleware for AWS S3 and Multer configuration
  * @todo // TODO Refactor this to use a function in the bootcamp controller vs a direct POST request in the server file
  */
 
@@ -80,9 +81,14 @@ app.post("/api/v1/bootcamps/:id/upload", upload, async (req, res, next) => {
 		Body: req.file.buffer,
 	};
 
-	s3.upload(params, async (err, data) => {
+	s3.upload(params, async (err, data, next) => {
 		if (err) {
-			res.status(500).send(err);
+			return next(
+				new ErrorResponse(
+					`There was an error while uploading the file. Please contact the system administrator`,
+					500
+				)
+			);
 		}
 
 		await Bootcamp.findByIdAndUpdate(id, {

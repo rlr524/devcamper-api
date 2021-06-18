@@ -1,5 +1,5 @@
 /**
- *@fileoverview This is a set of functions that act as controllers for all bootcamp routes
+ *@fileoverview Controllers for all bootcamp routes
  *@description Route controller functions using asyncHandler middleware to handle async/await try/catch blocks
  *@copyright Emiya Consulting 2021
  *@author Rob Ranf

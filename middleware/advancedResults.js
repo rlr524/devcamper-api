@@ -1,5 +1,5 @@
 /**
- *@fileoverview This is a middleware function that allows filtering, sorting, selecting and pagination on any resource
+ *@fileoverview Advanced results function for use with any resource
  *@description This is a middleware function that allows filtering, sorting, selecting and pagination on any resource
  *@copyright Emiya Consulting 2021
  *@author Rob Ranf
