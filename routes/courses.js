@@ -8,10 +8,22 @@ const {
 	deleteCourse,
 } = require("../controllers/courses");
 
+const Course = require("../models/Course");
+const advancedResults = require("../middleware/advancedResults");
+
 // Need to set mergeParams to true here to allow the use of params from both the courses and bootcamps routes
 const router = express.Router({ mergeParams: true });
 
-router.route("/").get(getCourses).post(createCourse);
+router
+	.route("/")
+	.get(
+		advancedResults(Course, {
+			path: "bootcamp",
+			select: "name description",
+		}),
+		getCourses
+	)
+	.post(createCourse);
 router.route("/:id").get(getCourse).put(updateCourse).patch(deleteCourse);
 
 module.exports = router;

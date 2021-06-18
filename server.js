@@ -35,6 +35,10 @@ connectDB();
 const bootcamps = require("./routes/bootcamps");
 const courses = require("./routes/courses");
 
+/**
+ * @todo // TODO Refactor this to use a function in the bootcamp controller vs a direct POST request in the server file
+ */
+
 // @desc	Upload a photo for a bootcamp
 // @route	POST /api/v1/bootcamps/:id/upload
 // @access	Private
