@@ -1,3 +1,12 @@
+/**
+ *@fileoverview This is the courses route.
+ *@description Includes all five course controller functions and utilizes Express router.
+ *@copyright Emiya Consulting 2021
+ *@author Rob Ranf
+ *@version 0.1
+ *@since 6/8/2021
+ */
+
 const express = require("express");
 
 const {

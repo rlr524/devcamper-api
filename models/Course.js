@@ -1,3 +1,12 @@
+/**
+ *@fileoverview This is the Mongoose model for the courses collection.
+ *@description The CourseSchema defines all fields related to the courses collection in the devcamper database on Mongo Atlas.
+ *@copyright Emiya Consulting 2021
+ *@author Rob Ranf
+ *@version 0.1
+ *@since 5/26/2021
+ */
+
 const mongoose = require("mongoose");
 const ErrorResponse = require("../utils/errorResponse");
 
@@ -44,6 +53,11 @@ const CourseSchema = new mongoose.Schema(
 	}
 );
 
+/**
+ * @method
+ * @param {*} bootcampId
+ * @returns averageCost
+ */
 // Static method to calculate average of course tuitions; on Mongoose we can use statics to create static methods which,
 // as with all languages, are methods that do not need to be instantiated to call, i.e. we do not need to save our method into
 // a variable and instantiate the calling object in order to use it as below

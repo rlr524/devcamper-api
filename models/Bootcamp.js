@@ -44,7 +44,7 @@ const BootcampSchema = new mongoose.Schema(
 		email: {
 			type: String,
 			match: [
-				/^\w+([\\.-]?\w+)*@\w+([\\.-]?\w+)*(\.\w{2,3})+$/,
+				/^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,14}$)/,
 				"Please enter a valid email",
 			],
 		},
@@ -133,17 +133,23 @@ const BootcampSchema = new mongoose.Schema(
 	}
 );
 
-/** @method */
-// Create a bootcamp slug using the provided name
+/**
+ * @method
+ * @description Create a bootcamp slug using the provided name
+ * @returns @property slug
+ */
 BootcampSchema.pre("save", function (next) {
 	this.slug = slugify(this.name, { lower: true });
 	next();
 });
 
-// Geocode and create location field
 /**
  * @todo //TODO When deploying to prod, need to update the IP restriction on the Google Maps API
+ * @method
+ * @description Geocode and create location field
+ * @returns @property location
  */
+// Geocode and create location field
 BootcampSchema.pre("save", async function (next) {
 	const loc = await geocoder.geocode(this.address);
 	this.location = {

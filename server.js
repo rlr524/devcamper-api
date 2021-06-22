@@ -34,6 +34,7 @@ connectDB();
 // Route imports
 const bootcamps = require("./routes/bootcamps");
 const courses = require("./routes/courses");
+const auth = require("./routes/auth");
 
 /**
  * @description Uses the imageUpload middleware for AWS S3 and Multer configuration
@@ -123,6 +124,7 @@ app.use(express.static(path.join(__dirname, "public")));
 // Mount routers
 app.use("/api/v1/bootcamps", bootcamps);
 app.use("/api/v1/courses", courses);
+app.use("/api/v1/auth", auth);
 
 // Custom error handler middleware
 app.use(errorHandler);

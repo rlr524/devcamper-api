@@ -1,3 +1,12 @@
+/**
+ *@fileoverview This is the bootcamps route.
+ *@description Includes all six bootcamp controller functions and utilizes Express router.
+ *@copyright Emiya Consulting 2021
+ *@author Rob Ranf
+ *@version 0.1
+ *@since 5/26/2021
+ */
+
 const express = require("express");
 
 const {
