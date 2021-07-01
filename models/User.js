@@ -9,6 +9,7 @@
 
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const UserSchema = new mongoose.Schema(
 	{
@@ -81,12 +82,25 @@ const UserSchema = new mongoose.Schema(
 );
 
 /**
- *
+ * @method
+ * @description Encrypt user's password using bcrypt
+ * @property password @returns hashed and salted password
  */
 UserSchema.pre("save", async function (next) {
 	const salt = await bcrypt.genSalt(10);
 	this.password = await bcrypt.hash(this.password, salt);
 	next();
 });
+
+/**
+ * @method
+ * @description Sign and return a json web token that expires in 30 days
+ * @returns json web token with user id as the payload
+ */
+UserSchema.methods.getSignedJwtToken = function () {
+	return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+		expiresIn: process.env.JWT_EXPIRE,
+	});
+};
 
 module.exports = mongoose.model("User", UserSchema);

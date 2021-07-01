@@ -54,7 +54,7 @@ const CourseSchema = new mongoose.Schema(
 );
 
 /**
- * @method
+ * @static
  * @param {*} bootcampId
  * @returns averageCost
  */

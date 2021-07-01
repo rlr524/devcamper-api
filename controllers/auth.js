@@ -24,8 +24,16 @@ exports.register = asyncHandler(async (req, res) => {
 		role,
 	});
 
+	/**
+	 * @constant
+	 * @fires getSignedJwtToken
+	 * @note In MongoDB model, a method is called on an instantiation of the model (user) where a static is called on the model itself (User)
+	 */
+	const token = user.getSignedJwtToken();
+
 	res.status(200).json({
 		success: true,
+		token,
 		data: user,
 	});
 });
