@@ -20,6 +20,7 @@ const { s3, upload } = require("./middleware/imageUpload");
 const uuid = require("uuid");
 const Bootcamp = require("./models/Bootcamp");
 const ErrorResponse = require("./utils/errorResponse");
+const cookieParser = require("cookie-parser");
 require("colors");
 
 const app = express();
@@ -27,6 +28,8 @@ const app = express();
 app.use(express.json());
 // Cors package
 app.use(cors());
+// Cookie parser package
+app.use(cookieParser());
 
 // Connect to database
 connectDB();
