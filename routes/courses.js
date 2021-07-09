@@ -19,6 +19,7 @@ const {
 
 const Course = require("../models/Course");
 const advancedResults = require("../middleware/advancedResults");
+const { protect } = require("../middleware/auth");
 
 // Need to set mergeParams to true here to allow the use of params from both the courses and bootcamps routes
 const router = express.Router({ mergeParams: true });
@@ -32,7 +33,11 @@ router
 		}),
 		getCourses
 	)
-	.post(createCourse);
-router.route("/:id").get(getCourse).put(updateCourse).patch(deleteCourse);
+	.post(protect, createCourse);
+router
+	.route("/:id")
+	.get(getCourse)
+	.put(protect, updateCourse)
+	.patch(protect, deleteCourse);
 
 module.exports = router;

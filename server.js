@@ -21,6 +21,7 @@ const uuid = require("uuid");
 const Bootcamp = require("./models/Bootcamp");
 const ErrorResponse = require("./utils/errorResponse");
 const cookieParser = require("cookie-parser");
+const { protect } = require("./middleware/auth");
 require("colors");
 
 const app = express();
@@ -48,67 +49,72 @@ const users = require("./routes/users");
 // @desc	Upload a photo for a bootcamp
 // @route	POST /api/v1/bootcamps/:id/upload
 // @access	Private
-app.post("/api/v1/bootcamps/:id/upload", upload, async (req, res, next) => {
-	let id = req.params.id;
-	const bootcamp = await Bootcamp.findById(id);
-	let image = req.file.originalname.split(".");
-	let imageSize = req.file.size;
-	let fileType = req.file.mimetype;
-	let imageSizeMB = Math.ceil(process.env.FILE_SIZE_LIMIT / 1048576);
-	const imageType = image[image.length - 1];
+app.post(
+	"/api/v1/bootcamps/:id/upload",
+	upload,
+	protect,
+	async (req, res, next) => {
+		let id = req.params.id;
+		const bootcamp = await Bootcamp.findById(id);
+		let image = req.file.originalname.split(".");
+		let imageSize = req.file.size;
+		let fileType = req.file.mimetype;
+		let imageSizeMB = Math.ceil(process.env.FILE_SIZE_LIMIT / 1048576);
+		const imageType = image[image.length - 1];
 
-	if (!bootcamp) {
-		return next(
-			new ErrorResponse(`No bootcamp found with the id of ${id}`, 404)
-		);
-	}
+		if (!bootcamp) {
+			return next(
+				new ErrorResponse(`No bootcamp found with the id of ${id}`, 404)
+			);
+		}
 
-	if (!req.file) {
-		return next(new ErrorResponse(`Please upload an image file`, 400));
-	}
+		if (!req.file) {
+			return next(new ErrorResponse(`Please upload an image file`, 400));
+		}
 
-	if (!fileType.startsWith("image")) {
-		return next(new ErrorResponse(`File must be an image`), 400);
-	}
+		if (!fileType.startsWith("image")) {
+			return next(new ErrorResponse(`File must be an image`), 400);
+		}
 
-	if (imageSize > process.env.FILE_SIZE_LIMIT) {
-		return next(
-			new ErrorResponse(
-				`Please limit the image size to less than ${imageSizeMB}MB`,
-				400
-			)
-		);
-	}
-
-	const params = {
-		Bucket: process.env.AWS_BUCKET_NAME,
-		Key: `${uuid()}.${imageType}`,
-		Body: req.file.buffer,
-	};
-
-	s3.upload(params, async (err, data, next) => {
-		if (err) {
+		if (imageSize > process.env.FILE_SIZE_LIMIT) {
 			return next(
 				new ErrorResponse(
-					`There was an error while uploading the file. Please contact the system administrator`,
-					500
+					`Please limit the image size to less than ${imageSizeMB}MB`,
+					400
 				)
 			);
 		}
 
-		await Bootcamp.findByIdAndUpdate(id, {
-			photo: data.Location,
-		});
+		const params = {
+			Bucket: process.env.AWS_BUCKET_NAME,
+			Key: `${uuid()}.${imageType}`,
+			Body: req.file.buffer,
+		};
 
-		res.status(200).json({
-			success: true,
-			url: data.Location,
-			type: imageType,
-			mimeType: fileType,
-			data,
+		s3.upload(params, async (err, data, next) => {
+			if (err) {
+				return next(
+					new ErrorResponse(
+						`There was an error while uploading the file. Please contact the system administrator`,
+						500
+					)
+				);
+			}
+
+			await Bootcamp.findByIdAndUpdate(id, {
+				photo: data.Location,
+			});
+
+			res.status(200).json({
+				success: true,
+				url: data.Location,
+				type: imageType,
+				mimeType: fileType,
+				data,
+			});
 		});
-	});
-});
+	}
+);
 
 // Log stream for http requests with Morgan dev logging middleware
 var accessLogStream = fs.createWriteStream(
