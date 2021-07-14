@@ -45,3 +45,20 @@ exports.protect = asyncHandler(async (req, res, next) => {
 		);
 	}
 });
+
+// Grant access to routes based on user role
+// Note the return of 403 vs 401 status...a 401 is "unauthorized" in that the client hasn't authenticated and must authenticate
+// where 403 is "forbidden" in that the client has authenticated but based on role, the client doesn't have access
+exports.authorize = (...roles) => {
+	return (req, res, next) => {
+		if (!roles.includes(req.user.role)) {
+			return next(
+				new ErrorResponse(
+					`User role [${req.user.role}] is not authorized to access this resource`,
+					403
+				)
+			);
+		}
+		next();
+	};
+};

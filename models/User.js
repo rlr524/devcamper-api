@@ -28,7 +28,7 @@ const UserSchema = new mongoose.Schema(
 		},
 		role: {
 			type: String,
-			enum: ["user", "publisher"],
+			enum: ["user", "publisher", "admin"],
 			default: "user",
 		},
 		// Password needs to have a lowercase, an uppercase, and a digit or special char and at least 8 chars

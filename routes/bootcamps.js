@@ -20,7 +20,7 @@ const {
 
 const Bootcamp = require("../models/Bootcamp");
 const advancedResults = require("../middleware/advancedResults");
-const { protect } = require("../middleware/auth");
+const { protect, authorize } = require("../middleware/auth");
 
 // Include other resource routers
 const courseRouter = require("./courses");
@@ -34,11 +34,11 @@ router.route("/radius/:zipcode/:distance/:units").get(getBootcampsInRadius);
 router
 	.route("/")
 	.get(advancedResults(Bootcamp, "courses"), getBootcamps)
-	.post(protect, createBootcamp);
+	.post(protect, authorize("publisher", "admin"), createBootcamp);
 router
 	.route("/:id")
 	.get(getBootcamp)
-	.put(protect, updateBootcamp)
-	.patch(protect, deleteBootcamp);
+	.put(protect, authorize("publisher", "admin"), updateBootcamp)
+	.patch(protect, authorize("publisher", "admin"), deleteBootcamp);
 
 module.exports = router;

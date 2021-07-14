@@ -21,7 +21,7 @@ const uuid = require("uuid");
 const Bootcamp = require("./models/Bootcamp");
 const ErrorResponse = require("./utils/errorResponse");
 const cookieParser = require("cookie-parser");
-const { protect } = require("./middleware/auth");
+const { protect, authorize } = require("./middleware/auth");
 require("colors");
 
 const app = express();
@@ -53,6 +53,7 @@ app.post(
 	"/api/v1/bootcamps/:id/upload",
 	upload,
 	protect,
+	authorize("publisher", "admin"),
 	async (req, res, next) => {
 		let id = req.params.id;
 		const bootcamp = await Bootcamp.findById(id);

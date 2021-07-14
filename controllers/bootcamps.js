@@ -154,6 +154,10 @@ exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
 
 	return res.status(200).json({
 		success: true,
-		data: bootcamp,
+		data: {
+			id: bootcamp.id,
+			name: bootcamp.name,
+			deleted: bootcamp.deleted,
+		},
 	});
 });
