@@ -69,6 +69,19 @@ app.post(
 			);
 		}
 
+		// Make sure user is bootcamp owner
+		if (
+			bootcamp.user.toString() !== req.user.id &&
+			req.user.role !== "admin"
+		) {
+			return next(
+				new ErrorResponse(
+					`The user with the id of ${req.user.id} is not able to update this bootcamp`,
+					400
+				)
+			);
+		}
+
 		if (!req.file) {
 			return next(new ErrorResponse(`Please upload an image file`, 400));
 		}

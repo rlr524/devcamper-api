@@ -119,6 +119,11 @@ const BootcampSchema = new mongoose.Schema(
 			type: Boolean,
 			default: false,
 		},
+		user: {
+			type: mongoose.Schema.ObjectId,
+			ref: "User",
+			required: true,
+		},
 		deleted: {
 			type: Boolean,
 			default: false,

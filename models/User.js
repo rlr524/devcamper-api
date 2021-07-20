@@ -26,9 +26,10 @@ const UserSchema = new mongoose.Schema(
 				"Please enter a valid email",
 			],
 		},
+		// The admin role needs to be added directly in the DB, this would normally only be someone with DBA rights
 		role: {
 			type: String,
-			enum: ["user", "publisher", "admin"],
+			enum: ["user", "publisher"],
 			default: "user",
 		},
 		// Password needs to have a lowercase, an uppercase, and a digit or special char and at least 8 chars

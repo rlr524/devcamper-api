@@ -92,7 +92,23 @@ exports.getBootcampsInRadius = asyncHandler(async (req, res, next) => {
 // @desc    Create a new bootcamp
 // @route   POST /api/v1/bootcamps
 // @access  Private
-exports.createBootcamp = asyncHandler(async (req, res) => {
+exports.createBootcamp = asyncHandler(async (req, res, next) => {
+	// Add user to req.body
+	req.body.user = req.user.id;
+
+	// Check for existing published bootcamp for this user
+	const publishedBootcamp = await Bootcamp.findOne({ user: req.user.id });
+
+	// If the user is not an admin, they can only add one bootcamp
+	if (publishedBootcamp && req.user.role !== "admin") {
+		return next(
+			new ErrorResponse(
+				`The user with the id of ${req.user.id} has already published a bootcamp`,
+				400
+			)
+		);
+	}
+
 	const bootcamp = await Bootcamp.create(req.body);
 	return res.status(201).json({
 		success: true,
@@ -104,10 +120,8 @@ exports.createBootcamp = asyncHandler(async (req, res) => {
 // @route   PUT /api/v1/bootcamps/:id
 // @access  Private
 exports.updateBootcamp = asyncHandler(async (req, res, next) => {
-	const bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
-		new: true,
-		runValidators: true,
-	});
+	let bootcamp = await Bootcamp.findById(req.params.id);
+
 	if (!bootcamp) {
 		return next(
 			new ErrorResponse(
@@ -116,6 +130,21 @@ exports.updateBootcamp = asyncHandler(async (req, res, next) => {
 			)
 		);
 	}
+
+	// Make sure user is bootcamp owner
+	if (bootcamp.user.toString() !== req.user.id && req.user.role !== "admin") {
+		return next(
+			new ErrorResponse(
+				`The user with the id of ${req.user.id} is not able to update this bootcamp`,
+				400
+			)
+		);
+	}
+
+	bootcamp = await Bootcamp.findOneAndUpdate(req.params.id, req.body, {
+		new: true,
+		runValidators: true,
+	});
 
 	return res.status(200).json({
 		success: true,
@@ -128,7 +157,25 @@ exports.updateBootcamp = asyncHandler(async (req, res, next) => {
 // @access  Private
 exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
 	let id = req.params.id;
-	const bootcamp = await Bootcamp.findByIdAndUpdate(
+	let bootcamp = await Bootcamp.findById(id);
+
+	if (!bootcamp) {
+		return next(
+			new ErrorResponse(`No bootcamp found with the id of ${id}`, 404)
+		);
+	}
+
+	// Make sure user is bootcamp owner
+	if (bootcamp.user.toString() !== req.user.id && req.user.rold !== "admin") {
+		return next(
+			new ErrorResponse(
+				`The user with the id of ${req.user.id} is not able to update this bootcamp`,
+				400
+			)
+		);
+	}
+
+	bootcamp = await Bootcamp.findOneAndUpdate(
 		id,
 		{
 			name: `${id}__DELETED`,
@@ -139,12 +186,6 @@ exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
 			runValidators: true,
 		}
 	);
-
-	if (!bootcamp) {
-		return next(
-			new ErrorResponse(`No bootcamp found with the id of ${id}`, 404)
-		);
-	}
 
 	/**
 	 * @todo // TODO Trigger cascadeDelete middleware to cascade flag as deleted all courses - middleware is not working
