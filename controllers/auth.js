@@ -11,9 +11,11 @@ const User = require("../models/User");
 const asyncHandler = require("../middleware/async");
 const ErrorResponse = require("../utils/errorResponse");
 
-// @desc Register user
-// @route POST /api/v1/auth/register
-// @access Public
+/**
+ * @description Register a user
+ * @route POST /api/v1/auth/register
+ * @public
+ */
 exports.register = asyncHandler(async (req, res) => {
 	const { name, email, password, role } = req.body;
 
@@ -27,9 +29,11 @@ exports.register = asyncHandler(async (req, res) => {
 	sendTokenResponse(user, 200, res);
 });
 
-// @desc Login user
-// @route POST /api/v1/auth/login
-// @access Public
+/**
+ * @description Login a user
+ * @route POST /api/v1/auth/login
+ * @public
+ */
 exports.login = asyncHandler(async (req, res, next) => {
 	const { email, password } = req.body;
 
@@ -67,9 +71,11 @@ exports.login = asyncHandler(async (req, res, next) => {
 	sendTokenResponse(user, 200, res);
 });
 
-// @desc Get current logged in user
-// @route GET /api/v1/auth/me
-// @access Private
+/**
+ * @description Get current logged in user
+ * @route GET /api/v1/auth/me
+ * @private
+ */
 exports.getMe = asyncHandler(async (req, res) => {
 	const user = await User.findById(req.user.id);
 
@@ -80,8 +86,43 @@ exports.getMe = asyncHandler(async (req, res) => {
 });
 
 /**
- * @constant
- * @fires sendTokenResponse
+ * @description Retrieve a forgotten password
+ * @route POST /api/v1/auth/forgotpassword
+ * @public
+ */
+exports.forgotPassword = asyncHandler(async (req, res, next) => {
+	const user = await User.findOne({ email: req.body.email });
+
+	if (!user) {
+		return next(
+			new ErrorResponse(
+				"If the user email exists in our database, the user will receive an email with reset instructions",
+				202
+			)
+		);
+	}
+
+	/**
+	 * @constant
+	 * @description Gets the reset token
+	 * @fires getResetPasswordToken
+	 */
+	const resetToken = user.getResetPasswordToken();
+
+	await user.save({ validateBeforeSave: false });
+
+	console.log(resetToken);
+
+	res.status(200).json({
+		success: true,
+		data: user,
+	});
+});
+
+/**
+ * @function
+ * @see controllers/auth.js -> register(), login()
+ * @description Get jwt token from model, create cookie and send response
  * @param {*} user
  * @param {*} statusCode
  * @param {*} res
@@ -89,16 +130,15 @@ exports.getMe = asyncHandler(async (req, res) => {
 const sendTokenResponse = (user, statusCode, res) => {
 	/**
 	 * @constant
-	 * @description Get jwt token
+	 * @description Gets the jwt token
 	 * @fires getSignedJwtToken
-	 * @note In MongoDB model, a method is called on an instantiation of the model (user) where a
-	 * static is called on the model itself (User)
+	 * @note In MongoDB model, a method is called on an instantiation of the model (e.g. user) where a static is called on the model itself (User)
 	 */
 	const token = user.getSignedJwtToken();
 
 	// The cookie package used by cookie-parser takes in a Date() object for expiration; if nothing is passed
 	// to the expiration property, it will be treated as a non-peristent cookie that expires when the browser is closed
-	// The expires prop is using 30 days, expressed in milliseconds, to match the jwt expiration
+	// The expires property is set to a value of 30 days, expressed in milliseconds, to match the jwt expiration
 	const options = {
 		expires: new Date(
 			Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
