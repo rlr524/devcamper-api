@@ -6,10 +6,11 @@
  *@version 0.1
  *@since 6/22/2021
  */
-
-const User = require("../models/User");
 const asyncHandler = require("../middleware/async");
+const crypto = require("crypto");
 const ErrorResponse = require("../utils/errorResponse");
+const sendEmail = require("../utils/sendEmail");
+const User = require("../models/User");
 
 /**
  * @description Register a user
@@ -86,6 +87,55 @@ exports.getMe = asyncHandler(async (req, res) => {
 });
 
 /**
+ * @description Update the current user's details such as name, email, profile pic, bio, and social urls.
+ * The active and role fields can only be updated by an admin and the password field is updated via a separate route and controller.
+ * @route PATCH /api/v1/auth/updateuserprofile
+ * @private
+ * @todo //TODO: Need to ensure that on the front-end, when the update page loads, it needs to load the current values as this function will update
+ * all of these fields and if a blank is loaded, it will blank out the field's existing data.
+ */
+exports.updateUserProfile = asyncHandler(async (req, res) => {
+	const fieldsToUpdate = {
+		name: req.body.name,
+		email: req.body.email,
+		profilePic: req.body.profilepic,
+		bio: req.body.bio,
+		twitterURL: req.body.twitterurl,
+		githubURL: req.body.githuburl,
+		facebookURL: req.body.facebookurl,
+		instagramURL: req.body.instagramurl,
+	};
+	const user = await User.findByIdAndUpdate(req.user.id, fieldsToUpdate, {
+		new: true,
+		runValidators: true,
+	});
+
+	res.status(200).json({
+		success: true,
+		data: user,
+	});
+});
+
+/**
+ * @description Update current logged on user's password
+ * @route PUT /api/v1/auth/updateuserpassword
+ * @private
+ */
+exports.updateUserPassword = asyncHandler(async (req, res, next) => {
+	const user = await User.findById(req.user.id).select("+password");
+
+	// Check current password
+	if (!(await user.matchPassword(req.body.currentPassword))) {
+		return next(new ErrorResponse("Password is incorrect", 401));
+	}
+
+	user.password = req.body.newPassword;
+	await user.save();
+
+	sendTokenResponse(user, 200, res);
+});
+
+/**
  * @description Retrieve a forgotten password
  * @route POST /api/v1/auth/forgotpassword
  * @public
@@ -111,17 +161,67 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
 
 	await user.save({ validateBeforeSave: false });
 
-	console.log(resetToken);
+	// Create reset url
+	const resetUrl = `${req.protocol}://${req.get(
+		"host"
+	)}/api/v1/auth/resetpassword/${resetToken}`;
 
-	res.status(200).json({
-		success: true,
-		data: user,
+	const message = `You are receiving this email because you (or someone else) has requested the reset of a password. Please make a PUT request to: \n\ ${resetUrl}`;
+
+	try {
+		await sendEmail({
+			email: user.email,
+			subject: "Devcamper password reset",
+			text: message,
+		});
+		res.status(200).json({
+			success: true,
+			data: `Email sent to ${user.email}`,
+		});
+	} catch (err) {
+		user.resetPasswordToken = undefined;
+		user.resetPasswordExpire = undefined;
+		await user.save({ validateBeforeSave: false });
+		return next(
+			new ErrorResponse("Reset email could not be sent", err),
+			500
+		);
+	}
+});
+
+/**
+ * @description Use the forgotten password token to reset a password
+ * @route PUT /api/v1/auth/resetpassword/:resettoken
+ * @public
+ */
+exports.resetPassword = asyncHandler(async (req, res, next) => {
+	// Get hashed token
+	const resetPasswordToken = crypto
+		.createHash("sha256")
+		.update(req.params.resettoken)
+		.digest("hex");
+
+	const user = await User.findOne({
+		resetPasswordToken,
+		resetPasswordExpire: { $gt: Date.now() },
 	});
+
+	if (!user) {
+		return next(new ErrorResponse("Invalid token", 400));
+	}
+
+	// Set new password
+	user.password = req.body.password;
+	user.resetPasswordToken = undefined;
+	user.resetPasswordExpire = undefined;
+	await user.save();
+
+	sendTokenResponse(user, 200, res);
 });
 
 /**
  * @function
- * @see controllers/auth.js -> register(), login()
+ * @see controllers/auth.js -> register(), login(), resetPassword()
  * @description Get jwt token from model, create cookie and send response
  * @param {*} user
  * @param {*} statusCode

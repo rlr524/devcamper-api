@@ -53,27 +53,27 @@ const UserSchema = new mongoose.Schema(
 		 */
 		profilePic: {
 			type: String,
-			default: "",
+			default: "Your profile picture",
 		},
 		bio: {
 			type: String,
-			default: "",
+			default: "Your bio",
 		},
 		twitterURL: {
 			type: String,
-			default: "",
+			default: "https://www.twitter.com/twitter",
 		},
 		githubURL: {
 			type: String,
-			default: "",
+			default: "https://wwww.github.com/github",
 		},
 		facebookURL: {
 			type: String,
-			default: "",
+			default: "https://www.facebook.com/facebook",
 		},
 		instagramURL: {
 			type: String,
-			default: "",
+			default: "https://www.instagram.com/instagram",
 		},
 		resetPasswordToken: String,
 		resetPasswordExpire: String,

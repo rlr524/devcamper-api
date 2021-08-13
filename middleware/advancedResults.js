@@ -1,6 +1,7 @@
 /**
  *@fileoverview Advanced results function for use with any resource
- *@description This is a middleware function that allows filtering, sorting, selecting and pagination on any resource
+ *@description This is a middleware function that allows filtering, sorting, selecting and pagination on any resource. It is
+ * imported on the routes vs in the controllers so can be used with the response object in any functions accessing request/response cycle.
  *@copyright Emiya Consulting 2021
  *@author Rob Ranf
  *@version 0.1
