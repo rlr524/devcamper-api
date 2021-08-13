@@ -69,39 +69,23 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
 });
 
 /**
- * @description Deactivate a user by updating the active flag to false
- * @route PATCH /api/v1/auth/users/:id
+ * @description Delete a user (perform a hard delete in compliance with most privacy standards)
+ * @route DELETE /api/v1/auth/users/:id
  * @private /Admin
- * @todo //TODO: Troubleshoot why this controller isn't updating the correct record
  */
-exports.deactivateUser = asyncHandler(async (req, res, next) => {
-	const id = req.params.id;
-	let user = await User.findById(id);
+exports.deleteUser = asyncHandler(async (req, res, next) => {
+	const user = await User.findById(req.params.id);
 
 	if (!user) {
 		return next(
-			new ErrorResponse(`No user found with the id of ${id}`, 404)
+			new ErrorResponse(`No user found with the id of ${req.params.id}`)
 		);
 	}
 
-	user = await User.findOneAndUpdate(
-		id,
-		{
-			name: `${id}__DELETED`,
-			active: false,
-		},
-		{
-			new: true,
-			runValidators: true,
-		}
-	);
+	await User.findByIdAndDelete(req.params.id);
 
 	res.status(200).json({
 		success: true,
-		data: {
-			id: user.id,
-			name: user.name,
-			active: user.active,
-		},
+		data: {},
 	});
 });
