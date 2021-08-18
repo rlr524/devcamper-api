@@ -105,8 +105,8 @@ exports.updateReview = asyncHandler(async (req, res, next) => {
 	});
 });
 
-// @desc    Delete a review by updating the deleted flag to true
-// @route   PATCH /api/v1/reviews/:id
+// @desc    Delete a review
+// @route   DELETE /api/v1/reviews/:id
 // @access  Private
 exports.deleteReview = asyncHandler(async (req, res, next) => {
 	let review = await Review.findById(req.params.id);
@@ -130,19 +130,15 @@ exports.deleteReview = asyncHandler(async (req, res, next) => {
 		);
 	}
 
-	review = await Review.findByIdAndUpdate(
-		req.params.id,
-		{
-			deleted: true,
-		},
-		{
-			new: true,
-			runValidators: true,
-		}
-	);
+	review = await Review.findByIdAndUpdate(req.params.id, req.body, {
+		new: true,
+		runValidators: true,
+	});
+
+	await review.save();
 
 	return res.status(200).json({
 		success: true,
-		data: review,
+		data: {},
 	});
 });
