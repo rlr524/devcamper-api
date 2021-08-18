@@ -130,15 +130,22 @@ exports.deleteReview = asyncHandler(async (req, res, next) => {
 		);
 	}
 
-	review = await Review.findByIdAndUpdate(req.params.id, req.body, {
-		new: true,
-		runValidators: true,
-	});
+	review = await Review.findByIdAndUpdate(
+		req.params.id,
+		{
+			deleted: true,
+			rating: null,
+		},
+		{
+			new: true,
+			runValidators: true,
+		}
+	);
 
 	await review.save();
 
 	return res.status(200).json({
 		success: true,
-		data: {},
+		data: review,
 	});
 });

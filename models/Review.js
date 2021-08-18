@@ -24,11 +24,13 @@ const ReviewSchema = new mongoose.Schema(
 		},
 		rating: {
 			type: Number,
-			min: 1,
-			max: 10,
-			required: [
-				true,
-				"Please add a course rating from 1 (Poor) to 10 (Outstanding)",
+			min: [
+				1,
+				"Please add a course rating from 1 (Poor) to 10 (Outsleasetanding)",
+			],
+			max: [
+				10,
+				"Please add a course rating from 1 (Poor) to 10 (Outsleasetanding)",
 			],
 		},
 		bootcamp: {
