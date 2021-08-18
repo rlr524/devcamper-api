@@ -1,6 +1,6 @@
 /**
  *@fileoverview These are the users routes.
- *@description Includes all *** user controller functions and utilizes Express router.
+ *@description Includes all user controller functions and utilizes Express router.
  *@copyright Emiya Consulting 2021
  *@author Rob Ranf
  *@version 0.1
@@ -8,7 +8,6 @@
  */
 
 const express = require("express");
-
 const router = express.Router();
 
 const {
