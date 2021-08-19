@@ -13,18 +13,19 @@ const ErrorResponse = require("../utils/errorResponse");
 const User = require("../models/User");
 
 // Protect routes
+// TODO: Need to determine if we want to use Bearer token or cookie here
 exports.protect = asyncHandler(async (req, res, next) => {
 	let token;
 	if (
 		req.headers.authorization &&
 		req.headers.authorization.startsWith("Bearer")
 	) {
+		// Set token from Bearer token in header
 		token = req.headers.authorization.split(" ")[1];
+	} else if (req.cookies.token) {
+		// Set token from cookie
+		token = req.cookies.token;
 	}
-
-	// else if (req.cookies.token) {
-	//     token = req.cookies.token
-	// }
 
 	// Make sure the token exists
 	if (!token) {

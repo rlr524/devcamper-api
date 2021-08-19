@@ -73,6 +73,23 @@ exports.login = asyncHandler(async (req, res, next) => {
 });
 
 /**
+ * @description Log out the current user and clear user cookie after ten seconds
+ * @route GET /api/v1/auth/logout
+ * @private
+ */
+exports.logout = asyncHandler(async (req, res) => {
+	res.cookie("token", "none", {
+		expires: new Date(Date.now() + 10 * 1000),
+		httpOnly: true,
+	});
+
+	res.status(200).json({
+		success: true,
+		data: {},
+	});
+});
+
+/**
  * @description Get current logged in user
  * @route GET /api/v1/auth/me
  * @private
