@@ -7,22 +7,23 @@
  *@since 5/26/2021
  */
 
+require("colors");
 require("dotenv").config({ path: "./config/.env" });
+const Bootcamp = require("./models/Bootcamp");
+const connectDB = require("./config/db");
+const cookieParser = require("cookie-parser");
+const cors = require("cors");
+const errorHandler = require("./middleware/error");
+const ErrorResponse = require("./utils/errorResponse");
 const express = require("express");
 const fs = require("fs");
-const path = require("path");
-const cors = require("cors");
 const logger = require("./middleware/errorLogger");
-const errorHandler = require("./middleware/error");
+const mongoSanitize = require("express-mongo-sanitize");
 const morgan = require("morgan");
-const connectDB = require("./config/db");
+const path = require("path");
+const { protect, authorize } = require("./middleware/auth");
 const { s3, upload } = require("./middleware/imageUpload");
 const uuid = require("uuid");
-const Bootcamp = require("./models/Bootcamp");
-const ErrorResponse = require("./utils/errorResponse");
-const cookieParser = require("cookie-parser");
-const { protect, authorize } = require("./middleware/auth");
-require("colors");
 
 const app = express();
 // Built-in body parser middleware for Express
@@ -31,6 +32,8 @@ app.use(express.json());
 app.use(cors());
 // Cookie parser package
 app.use(cookieParser());
+// Mongo-sanitize package
+app.use(mongoSanitize());
 
 // Connect to database
 connectDB();

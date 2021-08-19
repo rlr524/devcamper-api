@@ -7,8 +7,8 @@
  *@since 5/26/2021
  */
 
-const logger = require("../middleware/errorLogger");
 const ErrorResponse = require("../utils/errorResponse");
+const logger = require("../middleware/errorLogger");
 
 /** @constructor */
 const errorHandler = (err, req, res, next) => {
