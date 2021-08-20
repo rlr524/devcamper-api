@@ -47,9 +47,12 @@ exports.createUser = asyncHandler(async (req, res) => {
 	});
 });
 
-// @desc    Update a user
-// @route   PUT /api/v1/auth/users/:id
-// @access  Private/Admin
+/**
+ * @description Update a user's profile
+ * @route PUT /api/v1/auth/users/:id
+ * @private admin or the user that owns the profile
+ * @todo //TODO: Need to update this to allow the user to update their own profile. Remember to change protection on the route.
+ */
 exports.updateUser = asyncHandler(async (req, res, next) => {
 	const user = await User.findByIdAndUpdate(req.params.id, req.body, {
 		new: true,
@@ -71,7 +74,8 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
 /**
  * @description Delete a user (perform a hard delete in compliance with most privacy standards)
  * @route DELETE /api/v1/auth/users/:id
- * @private /Admin
+ * @private admin or the user that owns the profile
+ * @todo //TODO: Need to update this to allow the user to delete their own profile and then sign them out and clear cookie. Remember to change protection on the route.
  */
 exports.deleteUser = asyncHandler(async (req, res, next) => {
 	const user = await User.findById(req.params.id);
