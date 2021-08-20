@@ -38,15 +38,15 @@ const limiter = rateLimit({
 const app = express();
 // Built-in body parser middleware for Express
 app.use(express.json());
-// Cors package
+// Cors package allows requests from other origins
 app.use(cors());
 // Cookie parser package
 app.use(cookieParser());
 // Mongo-sanitize package
 app.use(mongoSanitize());
-// Helmet package
+// Helmet package sets headers
 app.use(helmet());
-// XSS-clean package
+// XSS-clean package to protect against cross-site scripting
 app.use(xss());
 // Rate-limit package with options
 app.use(limiter);
