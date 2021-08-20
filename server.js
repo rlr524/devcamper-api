@@ -18,6 +18,7 @@ const ErrorResponse = require("./utils/errorResponse");
 const express = require("express");
 const fs = require("fs");
 const helmet = require("helmet");
+const hpp = require("hpp");
 const logger = require("./middleware/errorLogger");
 const mongoSanitize = require("express-mongo-sanitize");
 const morgan = require("morgan");
@@ -27,6 +28,12 @@ const rateLimit = require("express-rate-limit");
 const { s3, upload } = require("./middleware/imageUpload");
 const uuid = require("uuid");
 const xss = require("xss-clean");
+
+// Rate-limit options
+const limiter = rateLimit({
+	windowMs: 15 * 60 * 1000, // 15 minutes
+	max: 100, // limit each IP to 100 requests per 15 minutes
+});
 
 const app = express();
 // Built-in body parser middleware for Express
@@ -41,12 +48,10 @@ app.use(mongoSanitize());
 app.use(helmet());
 // XSS-clean package
 app.use(xss());
-// Rate-limit package
-const limiter = rateLimit({
-	windowMs: 15 * 60 * 1000, // 15 minutes
-	max: 100, // limit each IP to 100 requests per 15 minutes
-});
-app.use(limiter());
+// Rate-limit package with options
+app.use(limiter);
+// Hpp package to protect against http parameter pollution attacks
+app.use(hpp());
 
 // Connect to database
 connectDB();
