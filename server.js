@@ -23,6 +23,7 @@ const mongoSanitize = require("express-mongo-sanitize");
 const morgan = require("morgan");
 const path = require("path");
 const { protect, authorize } = require("./middleware/auth");
+const rateLimit = require("express-rate-limit");
 const { s3, upload } = require("./middleware/imageUpload");
 const uuid = require("uuid");
 const xss = require("xss-clean");
@@ -40,6 +41,12 @@ app.use(mongoSanitize());
 app.use(helmet());
 // XSS-clean package
 app.use(xss());
+// Rate-limit package
+const limiter = rateLimit({
+	windowMs: 15 * 60 * 1000, // 15 minutes
+	max: 100, // limit each IP to 100 requests per 15 minutes
+});
+app.use(limiter());
 
 // Connect to database
 connectDB();
