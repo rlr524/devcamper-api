@@ -1,5 +1,8 @@
-# Config files
-config
+# Env vars files
+config/.env
+
+# Dummy data
+_data
 
 # Logs
 logs
@@ -70,10 +73,6 @@ web_modules/
 
 # Yarn Integrity file
 .yarn-integrity
-
-# dotenv environment variables file
-.env
-.env.test
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
