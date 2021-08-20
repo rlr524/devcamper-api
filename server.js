@@ -17,6 +17,7 @@ const errorHandler = require("./middleware/error");
 const ErrorResponse = require("./utils/errorResponse");
 const express = require("express");
 const fs = require("fs");
+const helmet = require("helmet");
 const logger = require("./middleware/errorLogger");
 const mongoSanitize = require("express-mongo-sanitize");
 const morgan = require("morgan");
@@ -24,6 +25,7 @@ const path = require("path");
 const { protect, authorize } = require("./middleware/auth");
 const { s3, upload } = require("./middleware/imageUpload");
 const uuid = require("uuid");
+const xss = require("xss-clean");
 
 const app = express();
 // Built-in body parser middleware for Express
@@ -34,6 +36,10 @@ app.use(cors());
 app.use(cookieParser());
 // Mongo-sanitize package
 app.use(mongoSanitize());
+// Helmet package
+app.use(helmet());
+// XSS-clean package
+app.use(xss());
 
 // Connect to database
 connectDB();
