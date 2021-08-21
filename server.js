@@ -160,9 +160,7 @@ var accessLogStream = fs.createWriteStream(
 	}
 );
 
-if (process.env.NODE_ENV === "development") {
-	app.use(morgan("combined", { stream: accessLogStream }));
-}
+app.use(morgan("combined", { stream: accessLogStream }));
 
 // Set static folder
 app.use(express.static(path.join(__dirname, "public")));
