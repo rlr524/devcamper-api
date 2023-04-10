@@ -17,7 +17,7 @@
 		"eslint": "^7.25.0"
 	},
 	"dependencies": {
-		"aws-sdk": "^2.929.0",
+		"aws-sdk": "^2.1354.0",
 		"bcryptjs": "^2.4.3",
 		"cookie-parser": "^1.4.5",
 		"cors": "^2.8.5",
